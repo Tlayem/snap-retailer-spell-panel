@@ -1,0 +1,8 @@
+# raw inputs are fetched by code/01_fetch.py (hashes in data/raw/PROVENANCE.txt)
+data/raw/*
+!data/raw/PROVENANCE.txt
+data/interim/
+__pycache__/
+.env
+*.pyc
+.DS_Store
