@@ -17,7 +17,7 @@ GAP_DAYS defaults to 365 (author's ruling V1, the Retailer Churn and Food Access
 convention). Pass another value to rebuild at a different window:
     python code/04_spells.py 0      # each authorization record is its own spell
 
-Writes data/processed/authorizations_part1.csv.gz and _part2.csv.gz, store_spells.csv.gz,
+Writes data/processed/authorizations_part1-3.csv.gz, store_spells.csv.gz,
 location_spells.csv.gz and data/interim/spells_log.json.
 """
 import json
@@ -136,12 +136,20 @@ def main():
             "coord_check", "coord_shared_locations", "authorization_date", "end_date", "auth_placeholder_1930",
             "end_before_auth", "end_on_batch_date", "in_50_states_dc", "fixed_location", "has_street_address"]
     a = r[cols].sort_values(["record_id", "authorization_date"])
-    # two parts, split by Record ID, so each file stays under GitHub's 25 MB browser-upload limit
-    cut = int(a["record_id"].iloc[len(a) // 2])
-    (OUT / "authorizations.csv.gz").unlink(missing_ok=True)
-    a[a["record_id"] < cut].to_csv(OUT / "authorizations_part1.csv.gz", index=False, date_format="%Y-%m-%d")
-    a[a["record_id"] >= cut].to_csv(OUT / "authorizations_part2.csv.gz", index=False, date_format="%Y-%m-%d")
-    log["authorizations_split_record_id"] = cut
+    # three parts, split by Record ID, so each file stays well under GitHub's 25 MB browser-upload limit
+    for old in OUT.glob("authorizations*.csv.gz"):
+        old.unlink()
+    cuts = [int(a["record_id"].iloc[len(a) * k // 3]) for k in (1, 2)]
+    bounds = [None] + cuts + [None]
+    for k in range(3):
+        lo, hi = bounds[k], bounds[k + 1]
+        m = pd.Series(True, index=a.index)
+        if lo is not None:
+            m &= a["record_id"] >= lo
+        if hi is not None:
+            m &= a["record_id"] < hi
+        a[m].to_csv(OUT / f"authorizations_part{k + 1}.csv.gz", index=False, date_format="%Y-%m-%d")
+    log["authorizations_split_record_ids"] = cuts
     sc = ["store_spell_id", "record_id", "spell_number", "start_date", "end_date", "n_records", "store_name",
           "store_type", "store_group", "state", "zip5", "county_fips", "tract_geoid", "geo_method", "location_id",
           "start_placeholder_1930", "end_on_batch_date", "open_at_file_end", "end_within_window_of_file_end",

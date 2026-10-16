@@ -18,7 +18,7 @@ The source lists one row per authorization. This dataset turns that list into th
 
 | File | Rows | One row per |
 |---|---:|---|
-| `data/processed/authorizations_part1.csv.gz`, `_part2.csv.gz` | 703,441 | FNS authorization record (every record in the source; nothing dropped). Split by Record ID into two files for upload limits; stack them to use. |
+| `data/processed/authorizations_part1.csv.gz`, `_part2`, `_part3` | 703,441 | FNS authorization record (every record in the source; nothing dropped). Split by Record ID into three files for upload limits; stack them to use. |
 | `data/processed/store_spells.csv.gz` | 669,515 | store spell (661,456 stores) |
 | `data/processed/location_spells.csv.gz` | 479,150 | address spell (425,095 addresses) |
 | `data/processed/national_year.csv` | | year × store group: stock on 1 January, entries, exits, rates |

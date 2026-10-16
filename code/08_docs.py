@@ -50,7 +50,7 @@ The source lists one row per authorization. This dataset turns that list into th
 
 | File | Rows | One row per |
 |---|---:|---|
-| `data/processed/authorizations_part1.csv.gz`, `_part2.csv.gz` | {n(S['records'])} | FNS authorization record (every record in the source; nothing dropped). Split by Record ID into two files for upload limits; stack them to use. |
+| `data/processed/authorizations_part1.csv.gz`, `_part2`, `_part3` | {n(S['records'])} | FNS authorization record (every record in the source; nothing dropped). Split by Record ID into three files for upload limits; stack them to use. |
 | `data/processed/store_spells.csv.gz` | {n(S['store_spells'])} | store spell ({n(S['record_ids'])} stores) |
 | `data/processed/location_spells.csv.gz` | {n(S['location_spells'])} | address spell ({n(S['locations'])} addresses) |
 | `data/processed/national_year.csv` | | year × store group: stock on 1 January, entries, exits, rates |

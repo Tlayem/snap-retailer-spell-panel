@@ -9,8 +9,8 @@ import shutil
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 DEST = ROOT.parent / "snap-retailer-spell-panel-public"
-PRIVATE = {"docs/BUILD_SPEC.md", "docs/VERIFY_CHECKLIST.md", "docs/PUBLISH_GUIDE.md", "docs/NEXT_STEPS.md"}
-INCLUDE = ["README.md", "LICENSE", "LICENSE-DATA", "CITATION.cff", ".zenodo.json", ".gitignore", "AUTHORS.json",
+PRIVATE = {"docs/BUILD_SPEC.md", "docs/VERIFY_CHECKLIST.md", "docs/PUBLISH_GUIDE.md", "docs/NEXT_STEPS.md", "docs/ZENODO_RECORD.md"}
+INCLUDE = ["README.md", "LICENSE", "LICENSE-DATA", "CITATION.cff", ".gitignore", "AUTHORS.json",
            "code", "docs", "data/processed", "data/raw/PROVENANCE.txt"]
 
 if DEST.exists():
