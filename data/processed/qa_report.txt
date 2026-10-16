@@ -1,0 +1,133 @@
+QA REPORT: The SNAP Retailer Spell Panel, 2005-2025 (v1.0.0)
+continuity window (V1): 365 days; nearest-tract tolerance (V2): 500 m
+
+1. ROW COUNTS
+   FNS records (raw)                                           703,441
+   FNS Record IDs                                              661,456
+   authorization rows (part1 + part2)                          703,441
+     end date before authorization date (kept, no spell)            45
+     outside 50 states + DC (GU, VI)                             1,244
+     farmers' markets + delivery routes                         11,948
+   store spells                                                669,515
+   locations (fixed-location addresses)                        425,095
+   location spells                                             479,150
+   county-year rows                                            374,507
+   tract-year rows                                           1,331,364
+PASS  every FNS record is in the authorization files (nothing dropped)
+PASS  every Record ID is present
+PASS  every valid record has exactly one store spell; invalid-date records have none
+PASS  every valid fixed-location record has a location spell; others have none
+PASS  store spell IDs match between files
+PASS  location spell IDs match between files
+PASS  spell IDs unique
+PASS  store spells account for every valid record
+PASS  location spells account for every valid fixed-location record
+
+2. AGREEMENT WITH RETAILER CHURN AND FOOD ACCESS v0.1.0 (doi:10.5281/zenodo.22884651)
+   restricted to 50 states + DC, fixed-location retailers, valid dates, 365-day window
+   records              this release    690,208   paper    690,208
+PASS  records reproduce the working paper exactly
+   store_spells         this release    657,298   paper    657,298
+PASS  store_spells reproduce the working paper exactly
+   location_spells      this release    478,117   paper    478,117
+PASS  location_spells reproduce the working paper exactly
+   locations            this release    424,118   paper    424,118
+PASS  locations reproduce the working paper exactly
+
+3. GEOCODING
+   point              698,730   99.33%
+   point_nearest           40    0.01%
+   county_name          4,670    0.66%
+   county_zip               1    0.00%
+   none                     0    0.00%
+   coordinate check: inside_tract 698,730, zero 4,571, other_state 59, no_tract_nearby 41, near_tract 40
+   tracts in Census file: 85,187; counties 3,234; tracts with any SNAP retailer: 74,068
+PASS  county assigned for 100.000% of records
+PASS  tract assigned for 99.336% of records (> 99%)
+PASS  tract GEOIDs are 11 digits and nest in the assigned county
+PASS  assigned county lies in the record's state
+   point county differs from the FNS county field: 5,413 of 698,263 compared (0.78%)
+     (mostly stores near county lines, Virginia independent cities, and FNS county-field errors;
+      the point-based county is used)
+   records whose exact coordinates are shared by >= 10 distinct addresses: 322
+
+4. DATA FEATURES THAT SHAPE INTERPRETATION
+   1 Jan 1930 placeholder authorization date: 6,666 records
+   End Dates shared by >= 1,000 records (administrative batch dates): 54; records ending on one: 119,153
+   ZIP codes restored to 5 digits (leading zero dropped in source): 52,336
+   records without a street address (keyed by Record ID): 5,217
+   Record IDs with more than one store spell: 7,960
+   store spells open at 31 Dec 2025: 249,063
+   location spells open at 31 Dec 2025: 242,484
+
+5. CONSISTENCY AND RANGE CHECKS
+PASS  store spells: end >= start
+PASS  location spells: end >= start
+PASS  consecutive store spells of a Record ID are > 365 days apart
+PASS  consecutive location spells of an address are > 365 days apart
+PASS  national stores: stock(y+1) = stock(y) + entries - exits, every year
+   store: exit rate 0.064-0.125; entry rate 0.066-0.213; stock 157,945-251,948
+PASS  national store rates within [0, 0.5]
+PASS  national locations: stock(y+1) = stock(y) + entries - exits, every year
+   location: exit rate 0.033-0.076; entry rate 0.036-0.170; stock 156,678-249,666
+PASS  national location rates within [0, 0.5]
+PASS  county-year store stock sums to the national stock
+   tract-year location stock / national: at least 99.98% every year
+PASS  tract-year panel covers > 99% of the national location stock
+
+6. NAMED SPOT CHECKS (look each up by hand: V4)
+   Source: FNS historical CSV (filter on Record ID); for open records the live Retailer Locator
+   https://www.fns.usda.gov/snap/retailer-locator ; tracts: https://geocoding.geo.census.gov
+   -- easy: open Super Store, Tennessee (Kroger 419): Record ID 1022007
+      Kroger 419                       Super Store            Germantown       TN auth 2011-09-06 -> open
+      county 47157 (FNS: SHELBY), tract 47157021351, geo point, coords 35.09546, -89.8052
+      store spells: 1022007-1
+   -- closed convenience store, Rutherford County TN (Murfreesboro): Record ID 1004135
+      ELPAISANO                        Convenience Store      Murfreesboro     TN auth 2011-05-26 -> 2012-07-12
+      county 47149 (FNS: RUTHERFORD), tract 47149042101, geo point, coords 35.8391, -86.35
+      store spells: 1004135-1
+   -- hard: three authorizations, same Record ID, two spells: Record ID 1000667
+      Seven Star                       Small Grocery Store    Daytona Beach    FL auth 2011-06-01 -> 2017-11-29
+      Seven Star                       Small Grocery Store    Daytona Beach    FL auth 2018-05-15 -> 2023-07-25
+      Seven Star                       Small Grocery Store    Daytona Beach    FL auth 2024-08-05 -> open
+      county 12127 (FNS: VOLUSIA), tract 12127081600, geo point, coords 29.22346, -81.03757
+      store spells: 1000667-1, 1000667-2
+   -- 1930 placeholder authorization date: Record ID 225857
+      GRAND CENTRAL MARKET INC         Supermarket            Somerset         MA auth 1930-01-01 -> 2005-03-02
+      county 25005 (FNS: BRISTOL), tract nan, geo county_name, coords nan, nan
+      store spells: 225857-1
+   -- record ending on an administrative batch date: Record ID 1526890
+      Landmark Travel Center           Convenience Store      Clyde            TX auth 2022-12-15 -> 2025-07-21
+      county 48059 (FNS: CALLAHAN), tract 48059030102, geo point, coords 32.41801, -99.52686
+      store spells: 1526890-1
+   -- coordinates recorded as 0, 0 -> county from FNS name, no tract: Record ID 737262
+      BEARFOOT INN ALASKA              Medium Grocery Store   COLD BAY         AK auth 2005-02-08 -> 2005-03-28
+      county 02013 (FNS: ALEUTIANS EAST), tract nan, geo county_name, coords nan, nan
+      store spells: 737262-1
+   -- point county differs from the FNS county field: Record ID 1074909
+      Cheris Food Store                Convenience Store      South Houston    TX auth 2012-10-02 -> 2014-02-18
+      county 48201 (FNS: FORT BEND), tract 48201323500, geo point, coords 29.66914, -95.20793
+      store spells: 1074909-1
+   -- random (seed 20261011): Record ID 990566
+      Dollar Tree 105                  Combination Grocery/Ot Murrells Inlet   SC auth 2011-02-08 -> open
+      county 45051 (FNS: HORRY), tract 45051051406, geo point, coords 33.57711, -79.02704
+      store spells: 990566-1
+   -- random (seed 20261011): Record ID 925314
+      Walgreens 11647                  Combination Grocery/Ot Monroe           WI auth 2009-11-12 -> open
+      county 55045 (FNS: GREEN), tract 55045960400, geo point, coords 42.60469, -89.6512
+      store spells: 925314-1
+   -- random (seed 20261011): Record ID 1194757
+      Ozark General Store              Convenience Store      Ozark            IL auth 2015-05-05 -> 2016-09-26
+      county 17087 (FNS: JOHNSON), tract 17087977600, geo point, coords 37.54231, -88.77276
+      store spells: 1194757-1
+   -- territory: Guam: Record ID 232103
+      GOGUE'S MINI MART                Medium Grocery Store   ORDOT            GU auth 1996-04-10 -> 2009-06-10
+      county 66010 (FNS: GUAM), tract 66010953101, geo point, coords 13.44226, 144.7744
+      store spells: 232103-1
+   -- location succession: 2080 Valentine Ave, Bronx NY 10457
+      671878   P.G. & SARA CORP                   2004-05-25 -> 2006-06-08  144189-1
+      792145   EMIL DELI GROCERY INC              2006-08-31 -> 2013-11-21  144189-1
+      1184953  Los Palmaritos Deli Grocery Corp   2015-04-22 -> 2016-08-06  144189-2
+      1484882  2080 Valentine Deli Grocery Corp   2022-09-29 -> open  144189-3
+
+RESULT: ALL HARD CHECKS PASS
