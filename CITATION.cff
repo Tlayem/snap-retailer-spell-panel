@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this dataset, please cite it as below."
+type: dataset
+title: "The SNAP Retailer Spell Panel, 2005–2025"
+version: 1.0.0
+date-released: "2026-10-11"
+license: CC-BY-4.0
+repository-code: "https://github.com/Tlayem/snap-retailer-spell-panel"
+authors:
+  - family-names: "Adesiyan"
+    given-names: "Taiwo Fausiyat"
+    orcid: "https://orcid.org/0000-0002-2023-3624"
+    affiliation: "Middle Tennessee State University, Murfreesboro, Tennessee, USA"
+    email: "adesiyanfausiyat010@gmail.com"
+keywords: [SNAP, food retail, food access, retailer entry and exit, spell data, census tracts, panel data]
+references:
+  - type: report
+    title: "Retailer Churn and Food Access"
+    authors:
+      - family-names: "Adesiyan"
+        given-names: "Taiwo Fausiyat"
+    year: 2026
+    doi: "10.5281/zenodo.22884651"
