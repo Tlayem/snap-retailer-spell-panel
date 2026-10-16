@@ -18,10 +18,12 @@ authorizations ──record_id──────────▶ store_spells (st
 store_spells, location_spells ──county_fips / tract_geoid──▶ county_year, tract_year, any Census-keyed data
 ```
 
-## authorizations_part1.csv.gz + authorizations_part2.csv.gz — one row per FNS authorization record (every record in the source)
+## authorizations_part1.csv.gz, _part2, _part3 — one row per FNS authorization record (every record in the source)
 
-The table is split by Record ID into two files (part 1: Record ID below 998037; part 2: 998037 and above) only to stay under
-GitHub's upload limit. Stack them to use: in R `rbind(read.csv(p1), read.csv(p2))`; in pandas `pd.concat([pd.read_csv(p1), pd.read_csv(p2)])`.
+The table is split by Record ID into three files (part 1: Record ID below 835411; part 2: 835411 to 1181388; part 3:
+1181389 and above) only to stay under GitHub's upload limit. Stack them to use, reading every column as text:
+in R `do.call(rbind, lapply(sprintf("authorizations_part%d.csv.gz", 1:3), read.csv, colClasses = "character"))`;
+in pandas `pd.concat([pd.read_csv(f"authorizations_part{k}.csv.gz", dtype=str) for k in (1, 2, 3)])`.
 
 | column | definition | source / transformation |
 |---|---|---|
